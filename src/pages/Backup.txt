@@ -1,0 +1,88 @@
+{
+                   (auth.newDatingCityId !== user.datingCity._id)  &&
+                    <Button 
+                    variant="primary" 
+                    style = {{backgroundColor: "#e62263", border: "none"}}
+                    className='float-right' 
+                    data-option-type = "select" 
+                    data-data-type = "datingCity"
+                    onClick={saveData}
+                    disabled = {auth.newDatingCityId !== user.datingCity._id}
+                    >
+                      Lưu thay đổi
+                    </Button>
+                    }
+
+                    //
+
+
+
+                    //
+
+                    import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import './index.css'
+import { BrowserRouter } from 'react-router-dom'
+import {combineReducers, configureStore} from "@reduxjs/toolkit"
+import {Provider} from "react-redux"
+import productsReducer, { productsFetch } from './features/productsSlice.js'
+import { productsApi } from './features/productsApi'
+import cartReducer, { getTotals } from './features/cartSlice.js'
+import authReducer from './features/authSlice.js'
+import profileReducer from './features/profileSlice.js'
+import modalReducer from './features/modalSlice.js'
+import homeReducer, { fetchHomeUsers } from './features/homeSlice.js'
+import { deFaultHomeUsersApi } from './features/defautlHomeUsersApi.js'
+import offCanvasReducer from './features/offCanvasSlice.js'
+//redux-persist
+import storage from 'redux-persist/lib/storage'
+import {persistReducer, persistStore} from 'redux-persist'
+//peristConfig
+const persistConfig = {
+  key: 'root',
+  storage,
+}
+const rootReducer = combineReducers({
+  products: productsReducer,
+  cart: cartReducer,
+  auth: authReducer,
+  profile: profileReducer,
+  modal: modalReducer,
+  home: homeReducer,
+  offCanvas: offCanvasReducer,
+  [productsApi.reducerPath]:productsApi.reducer,
+  [deFaultHomeUsersApi.reducerPath]: deFaultHomeUsersApi.reducer
+})
+const store = configureStore({
+  reducer: {
+    products: productsReducer,
+    cart: cartReducer,
+    auth: authReducer,
+    profile: profileReducer,
+    modal: modalReducer,
+    home: homeReducer,
+    offCanvas: offCanvasReducer,
+    [productsApi.reducerPath]:productsApi.reducer,
+    [deFaultHomeUsersApi.reducerPath]: deFaultHomeUsersApi.reducer
+  },
+  middleware: (getDefaultMiddleware) => {
+  return  getDefaultMiddleware().concat( deFaultHomeUsersApi.middleware, productsApi.middleware)
+  }  
+   
+})
+store.dispatch(productsFetch())
+store.dispatch(getTotals())
+store.dispatch(fetchHomeUsers())
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <BrowserRouter>
+        <Provider store = {store}>
+          <App />
+        </Provider>
+    </BrowserRouter>
+  </React.StrictMode>,
+)
+
+                    
